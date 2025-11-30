@@ -59,7 +59,22 @@ vim.opt.splitbelow = true
 vim.opt.mouse = "a"
 
 -- ===== 剪贴板 =====
-vim.opt.clipboard = "unnamedplus"
+-- 智能剪贴板：SSH 远程时使用 OSC 52，本地使用系统剪贴板
+if os.getenv("SSH_TTY") then
+  vim.g.clipboard = {
+    name = 'OSC 52',
+    copy = {
+      ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+      ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+    },
+    paste = {
+      ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+      ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+    },
+  }
+else
+  vim.opt.clipboard = "unnamedplus"
+end
 
 -- ===== 禁用不需要的 provider (消除警告) =====
 vim.g.loaded_perl_provider = 0
